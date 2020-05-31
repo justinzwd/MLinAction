@@ -2,6 +2,7 @@ from numpy import *
 import operator
 import matplotlib
 from matplotlib import pyplot as plt
+from os import listdir
 
 def createDataSet():
     group = array([[1.0,1.1],[1.0,1.0],[0,0],[0,0.1]])
@@ -78,6 +79,49 @@ def classifyPerson():
     print("You will probably like this person:",\
           resultList[classifierResult-1])
 
+def img2vector(filename):
+    returnVect = zeros((1,1024))
+    fr = open(filename)
+    for i in range(32):
+        lineStr = fr.readline()
+        for j in range(32):
+            returnVect[0,32*i+j] = int(lineStr[j])
+    return returnVect
+
+def handwritingClassTest():
+    hwLabels = []
+    trainingFileList = listdir('chapter2/digits/trainingDigits')
+    #m是训练文件夹的文件个数
+    m = len(trainingFileList)
+    trainingMat = zeros((m,1024))
+    for i in range(m):
+        fileNameStr = trainingFileList[i]
+        #因为文件名都是"0_12.txt"之类的，所以fileStr将是类似于0_12的形式字符串
+        fileStr = fileNameStr.split('.')[0]
+        #每个文件代表的label，待测数字
+        classNumStr = int(fileStr.split('_')[0])
+        hwLabels.append(classNumStr)
+        #第i行填充1024个数字
+        trainingMat[i,:] = img2vector('chapter2/digits/trainingDigits/%s' % fileNameStr)
+    testFileList = listdir('chapter2/digits/testDigits')
+    errorCount = 0.0
+    mTest = len(testFileList)
+    for i in range(mTest):
+        fileNameStr = testFileList[i]
+        fileStr = fileNameStr.split('.')[0]
+        classNumStr = int(fileStr.split('_')[0])
+        vectorUnderTest = img2vector('chapter2/digits/testDigits/%s' % fileNameStr)
+        classifierResult = classify0(vectorUnderTest,\
+                                     trainingMat,hwLabels,3)
+        print("the classifier came back with: %d, the real answer is: %d" \
+              % (classifierResult,classNumStr))
+        if classifierResult != classNumStr:
+            errorCount += 1.0
+    print("\nthe total number of errors is: %d" % errorCount)
+    print("\nthe total error rate is: %f" % (errorCount / float(mTest)))
+
+
+
 if __name__ == '__main__':
     # group,labels = createDataSet()
     # print(classify0([0,0],group,labels,3))
@@ -97,4 +141,10 @@ if __name__ == '__main__':
 
     # datingClassTest()
 
-    classifyPerson()
+    # classifyPerson()
+
+    # testVector = img2vector("chapter2/digits/testDigits/0_13.txt")
+    # print(testVector[0,0:31])
+    # print(testVector[0,32:63])
+
+    handwritingClassTest()
