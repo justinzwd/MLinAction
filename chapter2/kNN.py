@@ -4,6 +4,8 @@ import matplotlib
 from matplotlib import pyplot as plt
 from os import listdir
 
+# This python file contains methods of dating website system and handwriting recognition using kNN
+
 def createDataSet():
     group = array([[1.0,1.1],[1.0,1.0],[0,0],[0,0.1]])
     labels = ['A','A','B','B']
